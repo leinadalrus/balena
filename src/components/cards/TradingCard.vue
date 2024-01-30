@@ -7,62 +7,42 @@ import {
   ref,
   watch
 } from "vue"
+import CardBody from "./CardBody.vue";
 
-enum DeadOrAlives {
-  Dead = 0,
-  Alive = 1,
-  Unknown = Dead | Alive
-}
+function beginDrag() {
+  return (event:HTMLElement, data: any) => {
+    event.classList.add("card")
 
-const Lancer = reactive({
-  lancerID: 0,
-  company: "",
-  faction: "",
-  lastname: "",
-  firstname: "",
-  alive: true
-}) // Fetch JSON data of Mercenary Pilots
-
-defineProps<{
-  lancer?: typeof Lancer
-}>() // if using typescript pure-type annotations
-
-function validateLancerID() {
-  computed(() => {
-    return Lancer.lancerID >= 0 ? true : false
-  })
-}
-
-function lancerIsLiving() {
-  computed(() => {
-    return Lancer.alive == true ? false : DeadOrAlives.Unknown
-  })
-} // check DB schema validation for conditional rendering
-
-const positionX0 = ref(0)
-const positionY0 = ref(0)
-
-const damageComparator = defineEmits({
-  submit: ({ attack, defence }) => {
-    if (attack > defence)
-      return true
-    else
-      return false
+    data.dataTransfer.effectAllowed = "move"
+    data.setData("application/json", data.target.id)
+    data.currentTarget
   }
-}) // declarative tuple inference akin to `ruby`
-
-function updateVector2s(mouseEvent: MouseEvent) {
-  positionX0.value = mouseEvent.pageX
-  positionY0.value = mouseEvent.pageY
 }
 
-onMounted(() => {
-  window.addEventListener("mousemove", updateVector2s)
-})
+function endDrag() {
+  return (data: any) => {
+    data.dataTransfer.getData("application/json")
 
-onUnmounted(() => {
-  window.addEventListener("mousemove", updateVector2s)
-})
+    const element = document.getElementsByClassName(data)
+    const tabletop = data.currentTarget
+
+    tabletop.appendChild(element)
+  }
+}
+
+function dropOff() {
+  ((event: HTMLElement) => {
+    event.classList.remove("card")
+  })
+}
+
+function handleCard() {
+  ((card: EventTarget) => {
+    card.addEventListener("ondragstart", beginDrag)
+    card.addEventListener("ondragend", endDrag)
+    card.addEventListener("ondrop", dropOff)
+  })
+}
 
 watch(
   () => Lancer.lancerID,
@@ -73,13 +53,8 @@ watch(
 </script>
 
 <template>
-  <article :class="styles.Card">
-    <div>{{ validateLancerID }}</div>
-    <span>{{ lancerIsLiving }}</span>
-    <h1>{{ Lancer.company }}</h1>
-    <h2>{{ Lancer.faction }}</h2>
-    <i>{{ Lancer.lastname }}</i>
-    <p>{{ Lancer.firstname }}</p>
+  <article draggable="true" @drag="handleCard" :class="styles.Card">
+    <CardBody />
   </article>
 </template>
 
