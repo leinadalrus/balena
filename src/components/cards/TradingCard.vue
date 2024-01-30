@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue"
 
-const lancer = reactive({
+enum DeadOrAlives {
+  Dead = 0,
+  Alive = 1,
+  Unknown = Dead | Alive
+}
+
+const Lancer = reactive({
   lancerID: 0,
   company: "",
   faction: "",
@@ -10,32 +16,43 @@ const lancer = reactive({
   alive: true
 }) // Fetch JSON data of Mercenary Pilots
 
-function validateLancerID(){
+defineProps<{
+  lancer?: typeof Lancer
+}>() // if using typescript pure-type annotations
+
+function validateLancerID() {
   computed(() => {
-    return lancer.lancerID >= 0 ? true : false
+    return Lancer.lancerID >= 0 ? true : false
   })
 }
 
-function healthCheck(){
+function lancerIsLiving() {
   computed(() => {
-    return lancer.alive == true ? false : validateLancerID()
+    return Lancer.alive == true ? false : DeadOrAlives.Unknown
   })
 } // check DB schema validation for conditional rendering
+
+watch(
+  () => Lancer.lancerID,
+  lancerID => {
+    console.table(lancerID)
+  }
+) // here we use a getter
 </script>
 
 <template>
   <article :class="styles.Card">
-    <div>{{ validateLancerID() }}</div>
-    <span>{{ healthCheck() }}</span>
-    <h1>{{ lancer.company }}</h1>
-    <h2>{{ lancer.faction }}</h2>
-    <i>{{ lancer.lastname }}</i>
-    <p>{{ lancer.firstname }}</p>
+    <div>{{ validateLancerID }}</div>
+    <span>{{ lancerIsLiving }}</span>
+    <h1>{{ Lancer.company }}</h1>
+    <h2>{{ Lancer.faction }}</h2>
+    <i>{{ Lancer.lastname }}</i>
+    <p>{{ Lancer.firstname }}</p>
   </article>
 </template>
 
 <style scoped module="styles" lang="sass">
-@mixin theme($theme: Sunbather)
+@mixin theme($theme: Sforzato)
   background: $theme
   color: #1e1c1d
 

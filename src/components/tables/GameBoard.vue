@@ -3,12 +3,11 @@ import { computed, reactive, ref } from "vue";
 import TradingCard from "../cards/TradingCard.vue"
 
 const players = reactive([ref(TradingCard)])
-const tabletop = ref([[]])
+const gridmap = ref([[]])
 </script>
 
 <template>
-  <section>
-  </section>
+  <section> </section>
 </template>
 
 <style scoped module="styles" lang="sass"></style>
