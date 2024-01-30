@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue"
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch
+} from "vue"
 
 enum DeadOrAlives {
   Dead = 0,
@@ -32,6 +39,31 @@ function lancerIsLiving() {
   })
 } // check DB schema validation for conditional rendering
 
+const positionX0 = ref(0)
+const positionY0 = ref(0)
+
+const damageComparator = defineEmits({
+  submit: ({ attack, defence }) => {
+    if (attack > defence)
+      return true
+    else
+      return false
+  }
+}) // declarative tuple inference akin to `ruby`
+
+function updateVector2s(mouseEvent: MouseEvent) {
+  positionX0.value = mouseEvent.pageX
+  positionY0.value = mouseEvent.pageY
+}
+
+onMounted(() => {
+  window.addEventListener("mousemove", updateVector2s)
+})
+
+onUnmounted(() => {
+  window.addEventListener("mousemove", updateVector2s)
+})
+
 watch(
   () => Lancer.lancerID,
   lancerID => {
@@ -51,11 +83,9 @@ watch(
   </article>
 </template>
 
-<style scoped module="styles" lang="sass">
-@mixin theme($theme: Sforzato)
-  background: $theme
-  color: #1e1c1d
-
-.Card
-  @include theme
+<style scoped module="styles" lang="scss">
+.Card {
+  margin: auto;
+  padding: auto;
+}
 </style>
