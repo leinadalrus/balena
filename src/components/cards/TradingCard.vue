@@ -1,66 +1,61 @@
 <script setup lang="ts">
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  reactive,
-  ref,
-  watch
-} from "vue"
 import CardBody from "./CardBody.vue";
-
-function beginDrag() {
-  return (event:HTMLElement, data: any) => {
-    event.classList.add("card")
-
-    data.dataTransfer.effectAllowed = "move"
-    data.setData("application/json", data.target.id)
-    data.currentTarget
-  }
-}
-
-function endDrag() {
-  return (data: any) => {
-    data.dataTransfer.getData("application/json")
-
-    const element = document.getElementsByClassName(data)
-    const tabletop = data.currentTarget
-
-    tabletop.appendChild(element)
-  }
-}
-
-function dropOff() {
-  ((event: HTMLElement) => {
-    event.classList.remove("card")
-  })
-}
-
-function handleCard() {
-  ((card: EventTarget) => {
-    card.addEventListener("ondragstart", beginDrag)
-    card.addEventListener("ondragend", endDrag)
-    card.addEventListener("ondrop", dropOff)
-  })
-}
-
-watch(
-  () => Lancer.lancerID,
-  lancerID => {
-    console.table(lancerID)
-  }
-) // here we use a getter
+import { beginDrag } from "./CardHandler.vue"
 </script>
 
 <template>
-  <article draggable="true" @drag="handleCard" :class="styles.Card">
+  <article :draggable="true" :class="styles.CardContainer" @dragstart="beginDrag">
     <CardBody />
   </article>
 </template>
 
 <style scoped module="styles" lang="scss">
-.Card {
+.CardBanner {
+  text-orientation: sideways-right;
+  writing-mode: vertical-rl;
+  word-break: break-word;
+  max-height: 32vh;
+}
+
+.CardContainer {
+  display: flex;
+  overflow: scroll;
+
+  flex: 1;
+  background-color: #0f1014;
+  align-items: center;
+  justify-content: center;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.CardLayer {
+  clip-path: polygon(0 0%,
+      100% 0,
+      100% calc(100% - 0rem),
+      calc(100% - 0rem) 100%,
+      0 100%,
+      0% calc(100% - 0rem));
+
+  max-width: 15vw;
+  max-height: 32vh;
+
+  padding: 0.25rem 1rem;
   margin: auto;
-  padding: auto;
+
+  opacity: 99%;
+
+  backdrop-filter: blur(5.75256333rem);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%234065b0' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+  background-color: #000614;
+
+  border: none;
+  box-shadow: 1rem 1rem 4.912423rem rgba(3, 2, 3, 0.1),
+    -1rem 1rem 4.912423rem rgba(9, 2, 6, 0.1);
+  cursor: pointer;
+  color: #f7f9fe;
+
+  right: 17.5rem;
 }
 </style>

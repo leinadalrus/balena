@@ -4,6 +4,7 @@ import {
   defineEmits,
   defineProps,
   reactive,
+  watch
 } from "vue"
 
 enum DeadOrAlives {
@@ -48,6 +49,13 @@ function lancerIsLiving() {
     return Lancer.alive == true ? false : DeadOrAlives.Unknown
   })
 } // check DB schema validation for conditional rendering
+
+watch(
+  () => Lancer.lancerID,
+  lancerID => {
+    console.table(lancerID)
+  }
+) // here we use a getter
 
 defineProps<{
   lancer?: typeof Lancer
